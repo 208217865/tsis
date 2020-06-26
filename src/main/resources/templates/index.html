@@ -51,6 +51,7 @@
 			//
 			var respuesta;
 			$("#boton_insertar").click(function () {
+				$('#result').empty();
 				var alumno = {
 					matricula: $("#matricula").val(),
 					nombre: $("#nombre").val(),
@@ -83,7 +84,75 @@
 
 			});
 
+			
+			$("#boton_cargar").click(function(){
+				$('#result_visualizar').empty();
+				var matriculaBuscada = {
+					matricula: $("#cargar_por_id").val(),
+				}
+				
+				$.ajax({
+					type: "GET",
+					url: "http://localhost:8080/alumnos/"+matriculaBuscada.matricula,
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function (data, status) {
+						respuesta = data;
 
+						$("#result_visualizar").append(`						
+							<h4>Estado del post:<span class="status"> ${status} </span> los datos encontrados son:</h4>
+							<p>Matricula : <span class="status"> ${respuesta.matricula} </span></p>			
+							<p>Nombre : <span class="status"> ${respuesta.nombre} </span></p>
+							<p>Carrera : <span class="status"> ${respuesta.carrera} </span></p>
+				`);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+				
+				
+				
+				
+				
+			})
+			
+			
+			
+			//DELETE ENDPOINT
+			$("#boton_borrar").click(function(){
+				$("#result_borrar").empty();
+				var requestBorrar = {
+						matricula: $("#borrar_matricula").val()
+					}
+				var requestBorrarJSON = JSON.stringify(requestBorrar);
+				console.log("matricula a eliminar=" + requestBorrarJSON);
+				
+				
+				$.ajax({
+					type: "DELETE",
+					url: "http://localhost:8080/alumnos/"+requestBorrar.matricula,
+					data: requestBorrarJSON,
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function (data, status) {
+						respuesta = data;
+
+						$("#result_borrar").append(`
+							<h4>Estado del post:<span class="status"> ${status} </span> el alumno ha sido eliminado</h4>
+							
+				`);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+				
+				
+				
+			});
+			
+			
 		});
 	</script>
 </head>
@@ -155,7 +224,7 @@
 		<h3>Seccion Borrar</h3>
 		<div class="section">
 			<div>
-				<input type="text" placeholder="Inserta matricula" id="matricula"></input>
+				<input type="text" placeholder="Inserta matricula" id="borrar_matricula"></input>
 				<button id="boton_borrar" type="submit">Borrar</button>
 			</div>
 			<div>
