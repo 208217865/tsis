@@ -43,4 +43,38 @@ public class AlumnoService {
 	public List <Alumno> retrieveAll () {
 		return alumnoRepository.find();
 	}
+	
+	public Alumno findMatricula(Integer matricula) {
+		Alumno alumno = alumnoRepository.findByMatricula(matricula);
+		if(alumno == null) {
+			
+			return null;
+			
+		} else {
+			
+			return alumno;
+			
+		}
+	}
+	
+	
+	public Alumno updateAlumno(Alumno newalumno) {
+		Alumno alumnohelper=findMatricula(newalumno.getMatricula());
+		if(alumnohelper== null) {
+			return null;
+		}else {
+		return alumnoRepository.update(newalumno);
+		}
+	}
+	
+	public Alumno eliminaAlumno(Integer matricula) {
+		Alumno alumnohelper=findMatricula(matricula);
+		if(alumnohelper== null) {
+			return null;
+		}else {
+		return alumnoRepository.delete(matricula);
+		}
+	}
+	
+	
 }

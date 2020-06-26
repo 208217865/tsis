@@ -42,8 +42,18 @@ public class AlumnoRepository {
 		return new ArrayList <> (alumnoRepository.values());
 	}
 	
-	// falta update
+	public Alumno update(Alumno alumnonew) {
+		Alumno alumno = findByMatricula(alumnonew.getMatricula());
+		alumno.setNombre(alumnonew.getNombre());
+		alumno.setCarrera(alumnonew.getCarrera());
+		alumnoRepository.put(alumno.getMatricula(), alumno);
+		return alumno;
+	}
 	
-	// falta delete
+	public Alumno delete(Integer matricula) {
+		Alumno alumno = alumnoRepository.remove(matricula);
+		return alumno;
+	}
+	
  
 }
