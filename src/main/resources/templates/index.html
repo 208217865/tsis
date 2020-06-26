@@ -1,5 +1,170 @@
-<html>
-	<body>
-		Hola Spring Boot!
-	</body>
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+	<style type="text/css">
+		body {
+			width: 1024px;
+			margin: auto;
+			font-family: Helvetica, Arial, sans-serif;
+		}
+
+		section {
+			margin: 40px 0;
+		}
+
+		h1 {
+			text-align: center;
+		}
+
+		button:hover {
+			background-color: green;
+			color: white;
+		}
+
+		.status {
+			font-weight: bold;
+			color: green;
+		}
+
+		#result p {
+			display: inline;
+			margin: 0 20px 0 0;
+		}
+
+		.section {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: nowrap;
+			justify-content: space-between;
+			align-items: baseline;
+		}
+	</style>
+	<title>Document</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$.ajaxSetup()
+
+			//
+			var respuesta;
+			$("#boton_insertar").click(function () {
+				var alumno = {
+					matricula: $("#matricula").val(),
+					nombre: $("#nombre").val(),
+					carrera: $("#carrera").val()
+				}
+				var alumnoJSON = JSON.stringify(alumno);
+				console.log("Alumno=" + alumnoJSON);
+
+				$.ajax({
+					type: "POST",
+					url: "http://localhost:8080/alumnos",
+					data: alumnoJSON,
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function (data, status) {
+						respuesta = data;
+
+						$("#result").append(`
+						
+							<h4>Estado del post:<span class="status"> ${status} </span> los datos han sido guardados</h4>
+							<p>Matricula : <span class="status"> ${respuesta.matricula} </span></p>			
+							<p>Nombre : <span class="status"> ${respuesta.nombre} </span></p>
+							<p>Carrera : <span class="status"> ${respuesta.carrera} </span></p>
+				`);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+
+			});
+
+
+		});
+	</script>
+</head>
+
+<body>
+	<h1>Tarea Implementación de capas de negocio y datos</h1>
+	<section>
+		<h3>Seccion Insertar</h3>
+		<div class="section">
+			<div>
+				<input type="text" placeholder="Inserta matricula" id="matricula"></input>
+				<input type="text" placeholder="Inserta nombre" id="nombre"></input>
+				<input type="text" placeholder="Inserta carrera" id="carrera"></input>
+				<button id="boton_insertar" type="submit">Insertar</button>
+			</div>
+			<div>
+				<div id="result"></div>
+			</div>
+		</div>
+	</section>
+	<hr />
+	<section>
+		<h3>Seccion Visualizar por ID</h3>
+		<div class="section">
+			<div>
+				<input type="text" placeholder="Inserta matricula" id="cargar_por_id"></input>
+				<button id="boton_cargar" type="submit">Cargar</button>
+
+			</div>
+			<div>
+				<div id="result_visualizar"></div>
+			</div>
+		</div>
+	</section>
+
+	<hr />
+	<section>
+		<h3>Seccion Visualizar todo</h3>
+		<div class="section">
+			<div>
+				<button id="boton_cargar_todos" type="submit">Cargar Repositorio</button>
+
+			</div>
+			<div>
+				<div id="result_visualizar_todo"></div>
+			</div>
+		</div>
+	</section>
+
+	<hr />
+
+	<section>
+		<h3>Seccion Actualizar</h3>
+		<div class="section">
+			<div>
+				<input type="text" placeholder="Inserta matricula" id="actualizar_m"></input>
+				<input type="text" placeholder="Inserta nombre" id="actualizar_n"></input>
+				<input type="text" placeholder="Inserta carrera" id="actualizar_c"></input>
+				<button id="boton_actualizar" type="submit">Actualizar alumno</button>
+			</div>
+			<div>
+				<div id="result_actualizar"></div>
+			</div>
+		</div>
+	</section>
+	<section></section>
+	<hr />
+	<section>
+		<h3>Seccion Borrar</h3>
+		<div class="section">
+			<div>
+				<input type="text" placeholder="Inserta matricula" id="matricula"></input>
+				<button id="boton_borrar" type="submit">Borrar</button>
+			</div>
+			<div>
+				<div id="result_borrar"></div>
+			</div>
+		</div>
+	</section>
+	</section>
+
+</body>
+
 </html>
