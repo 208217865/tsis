@@ -10,6 +10,14 @@
 			margin: auto;
 			font-family: Helvetica, Arial, sans-serif;
 		}
+		
+		.header{
+			display:flex;
+			flex-direction:row;
+			flex-wrap: nowrap;
+			justify-content: space-between;
+			margin: 40px 0;
+		}
 
 		section {
 			margin: 40px 0;
@@ -48,7 +56,7 @@
 		$(document).ready(function () {
 			$.ajaxSetup()
 
-			//
+			//POST ENDPOINT
 			var respuesta;
 			$("#boton_insertar").click(function () {
 				$('#result').empty();
@@ -84,7 +92,7 @@
 
 			});
 
-			
+			//GET BY ID ENDPOINT
 			$("#boton_cargar").click(function(){
 				$('#result_visualizar').empty();
 				var matriculaBuscada = {
@@ -109,13 +117,78 @@
 					error: function (err) {
 						console.log(err);
 					}
-				});
-				
-				
-				
-				
-				
+				});	
 			})
+			
+			//GET ALL ENDPOINT
+			
+			$("#boton_cargar_todos").click(function(){
+				$('#result_visualizar_todos').empty();
+				
+				$.ajax({
+					type: "GET",
+					url: "http://localhost:8080/alumnos/",
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function (data, status) {
+						respuesta = data;
+						
+						$.each(respuesta, function (i, item) {
+							$("#result_visualizar_todos").append(`						
+								<h4>Estado del post:<span class="status"> ${status} </span> los datos encontrados son:</h4>
+								<p>Matricula : <span class="status"> ${item.matricula} </span></p>			
+								<p>Nombre : <span class="status"> ${item.nombre} </span></p>
+								<p>Carrera : <span class="status"> ${item.carrera} </span></p>
+							`);
+						});
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});				
+			})
+			
+			//UPDATE ENDPOINT
+			
+			
+			
+			
+			var respuesta;
+			$("#boton_actualizar").click(function () {
+				$('#result_actualizar').empty();
+				var alumnoNuevo = {
+					matricula: $("#actualizar_m").val(),
+					nombre: $("#actualizar_n").val(),
+					carrera: $("#actualizar_c").val()
+				}
+				var alumnoActualizarJSON = JSON.stringify(alumnoNuevo);
+				console.log("Alumno a Actualizar=" + alumnoActualizarJSON);
+
+				$.ajax({
+					type: "PUT",
+					url: "http://localhost:8080/alumnos/"+alumnoNuevo.matricula,
+					data: alumnoActualizarJSON,
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function (data, status) {
+						respuesta = data;
+
+						$("#result_actualizar").append(`
+						
+							<h4>Estado del post:<span class="status"> ${status} </span> los datos han sido guardados</h4>
+							<p>Matricula : <span class="status"> ${respuesta.matricula} </span></p>			
+							<p>Nombre : <span class="status"> ${respuesta.nombre} </span></p>
+							<p>Carrera : <span class="status"> ${respuesta.carrera} </span></p>
+				`);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+
+			});
+			
+			
 			
 			
 			
@@ -153,6 +226,18 @@
 			});
 			
 			
+			//REFRESH BUTTON
+			
+			$("#refresh").click(function(){
+				$("#result").empty();
+				$("#result_visualizar").empty();
+				$("#result_visualizar_todos").empty();
+				$("#result_actualizar").empty();
+				$("#result_borrar").empty();
+				
+			});
+			
+			
 		});
 	</script>
 </head>
@@ -160,7 +245,12 @@
 <body>
 	<h1>Tarea Implementación de capas de negocio y datos</h1>
 	<section>
-		<h3>Seccion Insertar</h3>
+	
+		<div class="header">
+			<h3>Seccion Insertar</h3>
+			<button id="refresh">Limpiar Formulario</button>
+		</div>
+		
 		<div class="section">
 			<div>
 				<input type="text" placeholder="Inserta matricula" id="matricula"></input>
@@ -197,7 +287,7 @@
 
 			</div>
 			<div>
-				<div id="result_visualizar_todo"></div>
+				<div id="result_visualizar_todos"></div>
 			</div>
 		</div>
 	</section>
