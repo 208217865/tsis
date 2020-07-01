@@ -1,12 +1,15 @@
 package mx.uam.tsis.ejemplobackend.negocio;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.swagger.annotations.ApiOperation;
 import mx.uam.tsis.ejemplobackend.datos.AlumnoRepository;
 import mx.uam.tsis.ejemplobackend.negocio.modelo.Alumno;
+
 
 @Service
 public class AlumnoService {
@@ -19,18 +22,23 @@ public class AlumnoService {
 	 * @param nuevoAlumno
 	 * @return el alumno que se acaba de crear si la creacion es exitosa, null de lo contrario
 	 */
+	
+	@ApiOperation(
+			value="Create",
+			notes="verifica si existe el objeto alumno para evitar duplicidad y si no existe conflicto pide al repositorio guardar al nuevo alumno, recibe de parametro al objeto nuevo alumno"
+			)
 	public Alumno create(Alumno nuevoAlumno) {
 		
 		// Regla de negocio: No se puede crear más de un alumno con la misma matricula
-		Alumno alumno = alumnoRepository.findByMatricula(nuevoAlumno.getMatricula());
+		Optional <Alumno> alumnoOpt = alumnoRepository.findById(nuevoAlumno.getMatricula());
 		
-		if(alumno == null) {
+		if(alumnoOpt.isPresent()) {
 			
-			return alumnoRepository.save(nuevoAlumno);
+			return null;
 			
 		} else {
 			
-			return null;
+			return alumnoRepository.save(nuevoAlumno);
 			
 		}
 		
@@ -40,39 +48,54 @@ public class AlumnoService {
 	 * 
 	 * @return
 	 */
-	public List <Alumno> retrieveAll () {
-		return alumnoRepository.find();
+	@ApiOperation(
+			value="Despliega alumnos",
+			notes="Solicita la lista de alumnos al repositorio, no requiere parametros"
+			)
+	public Iterable <Alumno> retrieveAll () {
+		return alumnoRepository.findAll();
 	}
+	@ApiOperation(
+			value="Busca alumno",
+			notes="Solicita el alumno al repositorio, requiere la matricula del alumno por matricula"
+			)
 	
-	public Alumno findMatricula(Integer matricula) {
-		Alumno alumno = alumnoRepository.findByMatricula(matricula);
-		if(alumno == null) {
-			
-			return null;
-			
-		} else {
+	public Optional<Alumno> findMatricula(Integer matricula) {
+		Optional <Alumno> alumno = alumnoRepository.findById(matricula);
+		if(alumno.isPresent()) {
 			
 			return alumno;
 			
+		} else {
+			
+			return null;
+			
 		}
 	}
 	
-	
+	@ApiOperation(
+			value="Actualiza Alumno",
+			notes="verifica la existencia de la matricula del alumno a modificar y si no existe conflicto solicita al repositorio actualizar los datos del objeto alumno, requiere un objeto de tipo alumno como parametro"
+			)
 	public Alumno updateAlumno(Alumno newalumno) {
-		Alumno alumnohelper=findMatricula(newalumno.getMatricula());
+		Optional<Alumno> alumnohelper= findMatricula(newalumno.getMatricula());
 		if(alumnohelper== null) {
 			return null;
 		}else {
-		return alumnoRepository.update(newalumno);
+		return alumnoRepository.save(newalumno);
 		}
 	}
-	
-	public Alumno eliminaAlumno(Integer matricula) {
-		Alumno alumnohelper=findMatricula(matricula);
+	@ApiOperation(
+			value="Borra alumno",
+			notes="Verifica la existencia de la matricula del alumno en el repositorio, requiere la matricula del alumno a elminar como parametro"
+			)
+	public Optional<Alumno> eliminaAlumno(Integer matricula) {
+		Optional<Alumno> alumnohelper=findMatricula(matricula);
 		if(alumnohelper== null) {
 			return null;
 		}else {
-		return alumnoRepository.delete(matricula);
+		alumnoRepository.deleteById(matricula);
+		return null;
 		}
 	}
 	

@@ -1,6 +1,7 @@
 package mx.uam.tsis.ejemplobackend.servicios;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import mx.uam.tsis.ejemplobackend.negocio.AlumnoService;
 import mx.uam.tsis.ejemplobackend.negocio.modelo.Alumno;
@@ -34,6 +36,11 @@ public class AlumnoController {
 	
 	@Autowired
 	private AlumnoService alumnoService;
+	
+	@ApiOperation(
+			value="Crear alumno",
+			notes="Permite crear un nuevo alumno, la matricula debe ser unica"
+			)
 	
 	
 	@PostMapping(path = "/alumnos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,19 +59,28 @@ public class AlumnoController {
 
 	}
 	
+	@ApiOperation(
+			value="Desplegar Alumnos",
+			notes="Permite visualizar la lista existente de alumnos"
+			)
+	
 	@GetMapping(path = "/alumnos", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity <?> retrieveAll() {
 		
-		List <Alumno> result = alumnoService.retrieveAll();
+		Iterable <Alumno> result = alumnoService.retrieveAll();
 		
 		return ResponseEntity.status(HttpStatus.OK).body(result); 
 		
 	}
 
+	@ApiOperation(
+			value="Buscar alumno por matricula",
+			notes="Permite visualizar a un alumno, utilizando la matricula como parametro"
+			)
 	@GetMapping(path = "/alumnos/{matricula}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity <?> retrieve(@PathVariable("matricula") Integer matricula) {
 		log.info("Buscando al alumno con matricula "+matricula);
-		Alumno alumnoEncontrado = alumnoService.findMatricula(matricula);
+		Optional<Alumno> alumnoEncontrado = alumnoService.findMatricula(matricula);
 		if(alumnoEncontrado != null) {
 			return ResponseEntity.status(HttpStatus.OK).body(alumnoEncontrado);			
 		} else {
@@ -73,7 +89,10 @@ public class AlumnoController {
 		
 		
 	}
-
+	@ApiOperation(
+			value="Actualizar alumno",
+			notes="Permite actualizar los datos de un alumno, la matricula no se actualiza solo el nombre y la carrera"
+			)
 	@PutMapping(path= "/alumnos/{matricula}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity <?> update(@PathVariable("matricula") Integer matricula, @RequestBody Alumno alumnonew) {
 		log.info("Update the student with this : " + alumnonew);
@@ -86,12 +105,15 @@ public class AlumnoController {
 	}
 
 	
-	
+	@ApiOperation(
+			value="Borrar alumno",
+			notes="Permite eliminar a un alumno existente"
+			)
 	@DeleteMapping(path = "/alumnos/{matricula}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity <?> delete(@PathVariable("matricula") Integer matricula) {
 		log.info("Delete the student with the registration number: " + matricula);
-		Alumno eliminado = alumnoService.eliminaAlumno(matricula);
-		if( eliminado != null) {
+		Optional<Alumno> eliminado = alumnoService.eliminaAlumno(matricula);
+		if( eliminado ==null) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("alumno eliminado"+eliminado);
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
